@@ -1,0 +1,14 @@
+#!/usr/bin/lua
+
+local input = tonumber(io.read("*all"):sub(1,-2))
+local buffer = {0}
+local pos = 1
+
+for n = 1,2017 do
+	pos = ((pos + input - 1) % #buffer) + 2
+
+	table.insert(buffer, pos, n)
+end
+
+print(buffer[pos + 1])
+

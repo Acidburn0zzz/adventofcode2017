@@ -1,0 +1,59 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local valid = 0
+
+local function isAna(w1, w2)
+	if #w1 ~= #w2 then
+		return false
+	end
+
+	local letterCount1 = {}
+	local letterCount2 = {}
+
+	for char in w1:gmatch"." do
+		letterCount1[char] = (letterCount1[char] or 0) + 1
+	end
+
+	for char in w2:gmatch"." do
+		letterCount2[char] = (letterCount2[char] or 0) + 1
+	end
+
+	for k,v in pairs(letterCount1) do
+		if letterCount2[k] ~= v then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function isSeen(word, seen)
+	for _,v in pairs(seen) do
+		if isAna(v, word) then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function doLine(line) 
+	local seen = {}
+	
+	for word in line:gmatch"[^ \t]*" do
+		if isSeen(word, seen) then
+			return
+		end
+
+		seen[#seen + 1] = word
+	end
+
+	valid = valid + 1
+end
+
+for line in input:gmatch"[^\n]*" do
+	doLine(line)
+end
+
+print(valid)

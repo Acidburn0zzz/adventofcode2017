@@ -1,0 +1,18 @@
+#!/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local severity = 0
+
+for line in input:gmatch"[^\n]+" do
+	local func = line:gmatch"[0-9]+"
+	local depth = func()
+	local range = func()
+	
+	local scannerPos = (depth) % (range * 2 - 2)
+
+	if scannerPos == 0 then
+		severity = severity + depth * range
+	end
+end
+
+print(severity)

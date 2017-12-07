@@ -1,0 +1,20 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local inst = {}
+local current = 1
+local count = 0
+
+for line in input:gmatch"[^\n]*" do
+	local number = tonumber(line)
+	inst[#inst + 1] = number
+end
+
+while current >= 1 and current <= #inst do
+	inst[current] = inst[current] + 1
+	current = current + inst[current] - 1
+
+	count = count + 1
+end
+
+print(count)

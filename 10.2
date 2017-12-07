@@ -1,0 +1,69 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local list = {}
+local ascii = {}
+local bytes = {}
+local suffix = {17, 31, 73, 47, 23}
+local output = ""
+local pos = 1
+local skip = 0
+
+local function reverse(start, finish)
+	local diff = (finish - start) / 2
+
+	for n = 0, diff do
+		list[start + n], list[finish - n] = list[finish - n], list[start + n]
+	end
+end
+
+local function doRound()
+	for _,v in ipairs(ascii) do
+		reverse(pos, pos + v - 1)
+		pos = pos + v + skip
+		skip = skip + 1
+	end
+end
+
+local function index(t, k)
+	k = ((k - 1) % 256) + 1
+	return t[k]
+end
+
+local function newindex(t, k, v)
+	k = ((k - 1) % 256) + 1
+	t[k] = v
+end
+
+for n = 1, 256 do
+	list[n] = n - 1
+end
+
+setmetatable(list, {__index=index, __newindex=newindex})
+
+for c in input:gmatch"." do
+	ascii[#ascii + 1] = string.byte(c)
+end
+
+for _,v in ipairs(suffix) do
+	ascii[#ascii + 1] = v
+end
+
+for n = 1,64 do
+	doRound()
+end
+
+for n = 1,256,16 do
+	local x = 0
+
+	x = bit32.bxor(unpack(list, n, n + 15))
+	
+	bytes[#bytes + 1] = x
+end
+
+for _,v in pairs(bytes) do
+	output = output .. string.format("%2x", v)
+end
+
+output = output:gsub(" ", "0")
+print(output)

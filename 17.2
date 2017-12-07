@@ -1,0 +1,18 @@
+#!/usr/bin/lua
+
+local input = tonumber(io.read("*all"):sub(1,-2))
+local pos = 1
+local bufferSize = 1
+local num
+
+for n = 1,5e7 do
+	pos = ((pos + input - 1) % bufferSize) + 2
+
+	if pos == 2 then
+		num = n
+	end
+
+	bufferSize = bufferSize + 1
+end
+
+print(num)

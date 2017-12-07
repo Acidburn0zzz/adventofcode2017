@@ -1,0 +1,35 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local total = 0
+
+for n = 0, 127 do
+	local str = input .. "-" .. n
+	local f = io.popen("./10.2 <<< " .. str);
+	local hash = f:read("*all"):sub(1,-2)
+	print(hash)
+	f:close()
+	local bin = ""
+
+	for c in hash:gmatch"." do
+		local width = 8
+		local num = tonumber("0x"..c)
+
+		while width >= 1 do
+			if num >= width then
+				num = num - width
+				bin = bin .. "1"
+			else
+				bin = bin .. "0"
+			end
+
+			width = width / 2
+		end
+
+	end
+	
+	local _, count = bin:gsub("1", "")
+	total = total + count
+end
+
+print(total)

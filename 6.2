@@ -1,0 +1,87 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local blocks = {}
+local seen = {}
+local count = 0
+
+local function tableEqual(t1, t2)
+	for i = 1, #t1 do
+		if t1[i] ~= t2[i] then
+			return false
+		end
+	end
+
+	return true
+end
+
+local function hasSeen(t)
+	for _,v in pairs(seen) do
+		if tableEqual(t,v) then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function copy(t)
+	local newt = {}
+
+	for k,v in pairs(t) do
+		newt[k] = v
+	end
+
+	return newt
+end
+
+local function largest(t)
+	local l = t[1]
+	local index = 1
+
+	for k,v in pairs(t) do
+		if v > l then
+			l = v
+			index = k
+		end
+	end
+
+	return index
+end
+
+local function dist(t)
+	local index = largest(t)
+	local l = t[index]
+	t[index] = 0
+		
+	while l > 0 do
+		index = (index % #blocks) + 1
+		t[index] = t[index] + 1
+		l = l - 1
+	end
+
+end
+
+for block in input:gmatch"[^\t ]*" do
+	blocks[#blocks + 1] = tonumber(block)
+end
+
+
+while (not hasSeen(blocks)) do
+	seen[#seen + 1] = copy(blocks)
+	dist(blocks)
+	count = count + 1
+
+end
+
+count = 0
+seen = {}
+
+while (not hasSeen(blocks)) do
+	seen[#seen + 1] = copy(blocks)
+	dist(blocks)
+	count = count + 1
+
+end
+
+print(count)

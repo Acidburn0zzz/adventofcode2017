@@ -1,0 +1,38 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local total = 0
+
+local function rowToTable(line)
+	local tab = {}
+
+	for num in line:gmatch"[^\t ]*" do
+		tab[#tab + 1] = tonumber(num)	
+	end
+
+	return tab
+end
+
+local function doDivide(tab)
+	for _,outer in pairs(tab) do
+		for _,inner in pairs(tab) do
+			if inner ~= outer then
+				if inner % outer == 0 then
+					return inner / outer
+				end
+
+				if outer % inner == 0 then
+					return outer / inner
+				end
+			end
+		end
+	end
+end
+
+
+for row in input:gmatch"[^\n]*" do
+	local tab = rowToTable(row)
+	total = total + doDivide(tab)
+end
+
+print(total)

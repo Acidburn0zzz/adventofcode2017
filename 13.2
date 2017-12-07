@@ -1,0 +1,26 @@
+#!/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+
+function go(delay)
+	for line in input:gmatch"[^\n]+" do
+		local func = line:gmatch"[0-9]+"
+		local depth = func()
+		local range = func()
+		
+		local scannerPos = (depth + delay) % (range * 2 - 2)
+
+		if scannerPos == 0 then
+			return true
+		end
+	end
+end
+
+local delay = 0
+
+repeat
+	delay = delay + 1
+	local caught = go(delay)
+until not caught
+
+print(delay)

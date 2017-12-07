@@ -1,0 +1,38 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+
+local tree = {}
+local current
+local found = false
+
+for line in input:gmatch("[^\n]*") do
+	local func = line:gmatch("[a-z]+")
+	local name = func()
+	local weight = tonumber(line:match("[0-9]+"))
+	local children = {}
+
+	for n in func do
+		children[#children + 1] = n
+	end
+
+	tree[name] = children
+end
+
+current = pairs(tree)(tree)
+
+while not found do
+	found = true
+
+	for parent, children in pairs(tree) do
+		for _,child in pairs(children) do
+			if child == current then
+				current = parent
+				found = false
+				break
+			end
+		end
+	end
+end
+
+print(current)

@@ -1,0 +1,33 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):gsub(1,-2)
+
+local x=0
+local y=0
+local furthest = 0
+
+for step in input:gmatch"[a-z]+" do
+	if step == 'n' then
+		y = y + 1
+	elseif step == 's' then
+		y = y - 1
+	elseif step == 'ne' then
+		x = x + .5
+		y = y + .5
+	elseif step == 'nw' then
+		x = x - .5
+		y = y + .5
+	elseif step == 'se' then
+		x = x + .5
+		y = y - .5
+	elseif step == 'sw' then
+		x = x - .5
+		y = y - .5
+	end
+
+	if math.abs(x+y) > furthest then
+		furthest = math.abs(x+y)
+	end
+end
+
+print(furthest)

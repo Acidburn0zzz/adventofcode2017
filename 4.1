@@ -1,0 +1,34 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local valid = 0
+
+local function isSeen(word, seen)
+	for _,v in pairs(seen) do
+		if word == v then
+			return true
+		end
+	end
+
+	return false
+end
+
+local function doLine(line) 
+	local seen = {}
+	
+	for word in line:gmatch"[^ \t]*" do
+		if isSeen(word, seen) then
+			return
+		end
+
+		seen[#seen + 1] = word
+	end
+
+	valid = valid + 1
+end
+
+for line in input:gmatch"[^\n]*" do
+	doLine(line)
+end
+
+print(valid)

@@ -1,0 +1,31 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+
+local total = 0
+
+local nums = input:gmatch"%d+"
+local lastA = nums()
+local lastB = nums()
+
+local factorA = 16807
+local factorB = 48271
+
+local divider = 2147483647
+local bitmask = 65535
+
+local function generate()
+	lastA = (lastA * factorA) % divider
+	lastB = (lastB * factorB) % divider
+
+	if (lastA & bitmask) == (lastB & bitmask) then
+		total = total + 1
+	end
+end
+
+for n = 1, 4e7 do
+	generate()
+end
+
+print(total)
+

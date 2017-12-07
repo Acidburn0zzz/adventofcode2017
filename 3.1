@@ -1,0 +1,19 @@
+#!/usr/bin/lua
+
+local input = tonumber(io.read("*all"):sub(1,-2))
+
+local root = math.ceil(math.sqrt(input))
+
+if root % 2 == 0 then
+	root = root + 1
+end
+
+local square = root^2
+local distance = root - 1 
+
+local difference = (square - input) % distance
+
+if difference > distance / 2 then
+	difference = distance - difference
+end
+print(distance - difference)

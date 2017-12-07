@@ -1,0 +1,39 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local list = {}
+local pos = 1
+local skip = 0
+
+local function reverse(start, finish)
+	local diff = (finish - start) / 2
+
+	for n = 0, diff do
+		list[start + n], list[finish - n] = list[finish - n], list[start + n]
+	end
+end
+
+local function index(t, k)
+	k = ((k - 1) % 256) + 1
+	return t[k]
+end
+
+
+local function newindex(t, k, v)
+	k = ((k - 1) % 256) + 1
+	t[k] = v
+end
+
+for n = 1, 256 do
+	list[n] = n - 1
+end
+
+setmetatable(list, {__index=index, __newindex=newindex})
+
+for n in input:gmatch"[0-9]+" do
+	reverse(pos, pos + n - 1)
+	pos = pos + n + skip
+	skip = skip + 1
+end
+
+print(list[1] * list[2])

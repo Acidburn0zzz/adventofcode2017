@@ -1,0 +1,37 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local list = {}
+local seen = {}
+local groupcount = 0
+
+local function amountInGroup(id)
+	seen[id] = true
+
+	for _,child in pairs(list[id]) do
+		if not seen[child] then
+			amountInGroup(child)
+		end
+	end
+end
+
+for line in input:gmatch"[^\n]*" do
+	local func = line:gmatch"[0-9]+"
+	local id = func()
+	local children = {}
+
+	for num in func do
+		children[#children + 1] = num
+	end
+
+	list[id] = children
+end
+
+for k in pairs(list) do
+	if not seen[k] then
+		groupcount = groupcount + 1
+		amountInGroup(k)
+	end
+end
+
+print(groupcount)

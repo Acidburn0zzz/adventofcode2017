@@ -1,0 +1,37 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+
+local registers = setmetatable({}, {__index = function() return 0 end})
+local largest = 0
+
+local function split(str)
+	local tbl = {}
+
+	for word in str:gmatch("[^ ]+") do
+		tbl[#tbl + 1] = word
+	end
+
+	return tbl
+end
+
+for line in input:gmatch"[^\n]*" do
+	local words = split(line)
+	
+	local name = words[1]
+	local sign = words[2] == "inc" and "" or "-"
+	local amount = words[3]
+	local conditionName = words[5]
+	local condition = words[6]:gsub("!", "~")
+	local conditionAmount = words[7]
+
+	local add = load("if " .. registers[conditionName] .. " ".. condition .. " " .. conditionAmount .. " then return " .. sign  .. "1*" .. amount .. " end" )() or 0
+
+	registers[name] = registers[name] + add
+
+	if registers[name] > largest then
+		largest = registers[name]
+	end
+end
+
+print(largest)

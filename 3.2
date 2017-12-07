@@ -1,0 +1,77 @@
+#!/usr/bin/lua
+
+local grid = {}
+
+local input = tonumber(io.read("*all"):sub(1,-2))
+
+local total = 1
+local distance = 0
+
+local xpos = 0
+local ypos = 0
+
+local function set(x, y, val)		
+	if not grid[x] then
+		grid[x] = {}
+	end
+
+	grid[x][y] = val
+
+	if val > input then
+		print (val)		
+		os.exit()
+	end
+end
+
+local function get(x, y)
+	if grid[x] and  grid[x][y] then
+		return grid[x][y]
+	end
+
+	return 0
+end
+
+local function getNeighbors()
+	local t = 0
+
+	for x = xpos - 1, xpos + 1 do
+		for y = ypos -1, ypos + 1 do
+			t = t + get(x, y)
+		end
+	end
+
+	return t
+end
+
+local function doCircle()
+	xpos = xpos + 1
+
+	for n = ypos, xpos do
+		ypos = n
+		set(xpos, ypos, getNeighbors())
+	end
+
+	for n = xpos - 1, -xpos, -1 do
+		xpos = n
+		set(xpos, ypos, getNeighbors())
+	end	
+	
+	for n = ypos - 1, -ypos, -1 do
+		ypos = n
+		set(xpos, ypos, getNeighbors())
+	end
+
+	for n = xpos + 1, -xpos do
+		xpos = n
+		set(xpos, ypos, getNeighbors())
+	end
+
+end
+
+set(0,0,1)
+while (true) do
+	doCircle()
+end
+
+
+

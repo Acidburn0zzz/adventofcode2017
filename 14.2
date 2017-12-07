@@ -1,0 +1,55 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local grid = {}
+local total = 0
+
+local function destroyRegion(pos)
+	if grid[pos] ~= 1 then
+		return
+	end
+	
+	grid[pos] = 4
+	destroyRegion(pos + 128)
+	destroyRegion(pos - 128)
+
+	if pos % 128 ~= 1 then
+		destroyRegion(pos - 1)
+	end
+
+	if pos % 128 ~= 0 then
+		destroyRegion(pos + 1)
+	end
+end
+
+for n = 0, 127 do
+	local str = input .. "-" .. n
+	local f = io.popen("./10.2 <<< " .. str);
+	local hash = f:read("*all"):sub(1,-2)
+	f:close()
+
+	for c in hash:gmatch"." do
+		local width = 8
+		local num = tonumber("0x"..c)
+
+		while width >= 1 do
+			if num >= width then
+				num = num - width
+				grid[#grid + 1] = 1
+			else
+				grid[#grid + 1] = 0
+			end
+
+			width = width / 2
+		end
+	end
+end
+
+for pos = 1,#grid do
+	if grid[pos] == 1 then
+		destroyRegion(pos)
+		total = total + 1
+	end
+end
+
+print(total)

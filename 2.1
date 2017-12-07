@@ -1,0 +1,24 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local total = 0
+
+for row in input:gmatch"[^\n]*" do
+	local smallest = math.huge
+	local biggest = 0
+	
+	for num in row:gmatch"[^\t ]*" do
+		num = tonumber(num)
+		
+		if num > biggest then
+			biggest = num
+		end
+
+		if num < smallest then
+			smallest = num
+		end
+	end
+		total = total + (biggest - smallest)
+end
+
+print(total)

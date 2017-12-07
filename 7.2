@@ -1,0 +1,101 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+
+local tree = {}
+local weights = {}
+local current
+local found = false
+local diff
+
+local function getWeight(n)
+	local weight = weights[n]
+
+	for _,child in pairs(tree[n]) do
+			weight = weight + getWeight(child)
+	end
+
+	return weight
+end
+
+for line in input:gmatch("[^\n]*") do
+	local func = line:gmatch("[a-z]+")
+	local name = func()
+	local weight = tonumber(line:match("[0-9]+"))
+	local children = {}
+
+	for n in func do
+		children[#children + 1] = n
+	end
+	
+	weights[name] = weight
+
+	tree[name] = children
+end
+
+current = pairs(tree)(tree)
+
+while not found do
+	found = true
+
+	for parent, children in pairs(tree) do
+		for _,child in pairs(children) do
+			if child == current then
+				current = parent
+				found = false
+				break
+			end
+		end
+	end
+end
+
+local difference
+local last
+
+for _,child in pairs(tree[current]) do
+	local c = getWeight(child)
+	
+	if last and last ~= c then
+		difference = math.max(last, c) - math.min(last, c)
+		break
+	end
+
+	last = c
+end
+
+while true do
+	local ws = {}
+	local biggestw
+	local biggestn
+	local different = false
+
+	for _,child in pairs(tree[current]) do
+		local w = getWeight(child)
+		ws[child] = w
+	end
+
+	biggestn, biggestw = pairs(ws)(ws)
+	local first = biggestw
+
+	for n,w in pairs(ws) do
+		if w > biggestw then
+			biggestw = w
+			biggestn = n
+		end
+
+		
+		if w ~= first then
+			different = true
+		end
+	end
+
+	if not different then
+		break
+	end
+	
+	current = biggestn
+end
+
+
+print(weights[current] - difference)
+

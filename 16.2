@@ -1,0 +1,84 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+
+local programs = {}
+local programsOriginal = {}
+local programsStart = 0
+local loopSize
+
+for n = 0,15 do
+	programs[n] = string.char(97 + n)
+	programsOriginal[n] = programs[n]
+end
+
+local function dance()
+	for inst in input:gmatch"[^,]+" do
+		local operation = inst:sub(1,1)
+		local nums = {}
+
+		for num in inst:sub(2):gmatch"[^/]+" do
+			nums[#nums + 1] = num
+		end
+
+		if operation == "s" then
+			for n = 1, nums[1]  do
+				local finish = programsStart + 15
+				programs[programsStart - nums[1] + n - 1] = programs[finish - nums[1] + n]
+				programs[finish - nums[1] + n] = nil
+			end
+
+			programsStart = programsStart - nums[1]
+		end
+
+		if operation == "p" then
+			local indexes = {}
+
+			for k,v in pairs(programs) do
+				if v == nums[1] then
+					nums[1] = k - programsStart
+				end
+
+				if v == nums[2] then
+					nums[2] = k - programsStart
+				end
+			end
+		end
+			
+		if operation == "x" or operation == "p" then
+			local pos1 = nums[1] + programsStart
+			local pos2 = nums[2] + programsStart
+
+			programs[pos1], programs[pos2] = programs[pos2], programs[pos1]
+		end
+	end
+end
+
+local function tblEqual(tbl1, tbl2)
+	for k,v in pairs(tbl1) do
+		if v ~= tbl2[k - programsStart] then
+			return false
+		end
+	end
+
+	return true
+end
+
+for n = 1,1e9 do
+	dance()
+
+	if tblEqual(programs, programsOriginal) then
+		loopSize = n
+		break
+	end
+end
+
+for n = 1, 1e9 % loopSize do
+	dance()
+end
+
+for n = programsStart, programsStart + 15 do
+	io.write(programs[n])
+end
+
+print()

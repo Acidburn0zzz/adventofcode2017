@@ -1,0 +1,93 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+
+local instructions = {}
+local registers0 = setmetatable({}, {__index=function()return 0 end})
+local registers1 = setmetatable({}, {__index=function()return 0 end})
+
+registers0.pc = 1
+registers1.pc = 1
+
+registers0.p = 0
+registers1.p = 1
+
+registers0.msg = {}
+registers1.msg = {}
+
+for line in input:gmatch"[^\n]+" do
+	local func = line:gmatch"[^ ]+"
+	local inst = {}
+
+	inst.op = func()
+	inst.x = func()
+	inst.y = func()
+
+	instructions[#instructions + 1] = inst
+end
+
+local function processInst(registers, friend)
+	local inst = instructions[registers.pc]
+	local xi = tonumber(inst.x) or tonumber(registers[inst.x])
+	local yi = tonumber(inst.y) or tonumber(registers[inst.y])
+
+	if inst.op == "set" then
+		registers[inst.x] = yi
+	end
+
+	if inst.op == "add" then
+		registers[inst.x] = registers[inst.x] + yi
+	end
+
+	if inst.op == "mul" then
+		registers[inst.x] = registers[inst.x] * yi
+	end
+
+	if inst.op == "mod" then
+		registers[inst.x] = registers[inst.x] % yi
+	end
+
+	if inst.op == "snd" then
+		friend.msg[#friend.msg + 1] = xi
+		registers.total = registers.total + 1
+	end
+
+	if inst.op == "rcv" then
+			coroutine.yield()
+			registers[inst.x] = table.remove(registers.msg, 1)
+	end
+
+	if inst.op == "jgz" and xi > 0 then
+		registers.pc = registers.pc + yi
+	else
+		registers.pc = registers.pc + 1
+	end
+end
+
+local function runProgram(registers, friend)
+	while registers.pc <= #instructions and registers.pc >= 1 do
+		processInst(registers, friend)
+	end
+end
+
+local function isFinished(co0, co1)
+	return (#registers0.msg == 0 and #registers1.msg == 0) or
+	coroutine.status(co0) == "dead" or coroutine.status(co1) == "dead"
+end
+
+local co0 = coroutine.create(function() runProgram(registers0, registers1) end)
+local co1 = coroutine.create(function() runProgram(registers1, registers0) end)
+
+coroutine.resume(co0)
+
+repeat
+	while #registers0.msg > 0 do
+		coroutine.resume(co0)
+	end
+
+	while #registers1.msg > 0 do
+		coroutine.resume(co1)
+	end
+until isFinished(co0, co1)
+
+print(registers1.total)

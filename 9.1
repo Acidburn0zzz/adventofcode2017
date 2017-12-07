@@ -1,0 +1,42 @@
+#!/usr/bin/lua
+
+local input = io.read("*all"):sub(1,-2)
+local score = 0
+
+function processGarbage(pos)
+	while true do
+		local c = input:sub(pos,pos)
+		
+		if c == "!" then
+			pos = pos + 2
+		elseif c == ">" then
+			return pos + 1
+		else
+			pos = pos + 1
+		end
+	end
+end
+
+function processGroup(pos, level)
+	while true do
+		local c = input:sub(pos,pos)
+
+		if c == "{" then
+			pos = processGroup(pos + 1, level + 1)
+		elseif c == "}" then
+			score = score + level
+			return pos + 1
+		elseif c == "," then
+			pos = pos + 1
+		elseif c == "<" then
+			pos = processGarbage(pos + 1)
+		else
+			pos = pos + 1
+		end
+
+	end
+
+end
+
+processGroup(2,1)
+print(score)
